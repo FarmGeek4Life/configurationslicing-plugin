@@ -8,7 +8,6 @@ import hudson.model.ViewGroup;
 import hudson.model.Descriptor.FormException;
 import hudson.security.Permission;
 import jenkins.model.Jenkins;
-import hudson.model.Hudson;
 import hudson.model.View;
 
 import java.io.IOException;
@@ -105,7 +104,7 @@ public class ConfigurationSlicing extends ManagementLink {
     }
 
     public Object getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
-        Jenkins.get().checkPermission(Hudson.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         for(Slicer s : getAxes()) {
             if(s.getUrl().equals(token)) {
@@ -206,7 +205,7 @@ public class ConfigurationSlicing extends ManagementLink {
         	}
         }
         public Object getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
-            Jenkins.get().checkPermission(Hudson.ADMINISTER);
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             String viewName = req.getParameter("view");
             View view = null;
             if (viewName != null) {

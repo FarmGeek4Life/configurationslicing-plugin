@@ -10,7 +10,6 @@ import hudson.model.Item;
 import jenkins.model.Jenkins;
 import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
-import hudson.model.Hudson;
 import configurationslicing.UnorderedStringSlicer;
 
 public abstract class AbstractSimpleProjectSlicer extends UnorderedStringSlicer<AbstractProject> {

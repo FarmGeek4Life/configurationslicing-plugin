@@ -2,7 +2,6 @@ package configurationslicing.label;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.Label;
 import jenkins.model.Jenkins;
 

@@ -2,7 +2,6 @@ package configurationslicing.jdk;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.JDK;
 import jenkins.model.Jenkins;
 

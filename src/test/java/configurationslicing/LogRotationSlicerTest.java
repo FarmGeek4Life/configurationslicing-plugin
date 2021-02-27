@@ -6,17 +6,21 @@ import hudson.tasks.LogRotator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jvnet.hudson.test.HudsonTestCase;
-
 import configurationslicing.logrotator.LogRotationSlicer;
 import configurationslicing.logrotator.LogRotationSlicer.LogRotationBuildsSliceSpec;
 import configurationslicing.logrotator.LogRotationSlicer.LogRotationDaysSliceSpec;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.jvnet.hudson.test.JenkinsRule;
 
-public class LogRotationSlicerTest extends HudsonTestCase {
+public class LogRotationSlicerTest {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
 	@SuppressWarnings("unchecked")
 	public void testSetValues() throws Exception {
-		AbstractProject item = createFreeStyleProject();
+		AbstractProject item = j.createFreeStyleProject();
 		
 	    int daysToKeep = 111;
 	    int numToKeep = 222;
@@ -48,10 +52,10 @@ public class LogRotationSlicerTest extends HudsonTestCase {
 	}
 	
 	private void assertEquals(LogRotator lr, int daysToKeep, int numToKeep, int artifactDaysToKeep, int artifactNumToKeep) {
-		assertEquals(daysToKeep, lr.getDaysToKeep());
-		assertEquals(numToKeep, lr.getNumToKeep());
-		assertEquals(artifactDaysToKeep, lr.getArtifactDaysToKeep());
-		assertEquals(artifactNumToKeep, lr.getArtifactNumToKeep());
+		Assert.assertEquals(daysToKeep, lr.getDaysToKeep());
+		Assert.assertEquals(numToKeep, lr.getNumToKeep());
+		Assert.assertEquals(artifactDaysToKeep, lr.getArtifactDaysToKeep());
+		Assert.assertEquals(artifactNumToKeep, lr.getArtifactNumToKeep());
 	}
 	
 	public void testLogRotatorEquals() {
@@ -73,15 +77,15 @@ public class LogRotationSlicerTest extends HudsonTestCase {
 		LogRotator r1 = new LogRotator(d1, n1, 0, 0);
 		LogRotator r2 = new LogRotator(d2, n2, 0, 0);
 		boolean equals = LogRotationSlicer.equals(r1, r2);
-		assertEquals(expect, equals);
-		assertFalse(LogRotationSlicer.equals(r1, null));
-		assertFalse(LogRotationSlicer.equals(null, r1));
-		assertFalse(LogRotationSlicer.equals(r2, null));
-		assertFalse(LogRotationSlicer.equals(null, r2));
+		Assert.assertEquals(expect, equals);
+		Assert.assertFalse(LogRotationSlicer.equals(r1, null));
+		Assert.assertFalse(LogRotationSlicer.equals(null, r1));
+		Assert.assertFalse(LogRotationSlicer.equals(r2, null));
+		Assert.assertFalse(LogRotationSlicer.equals(null, r2));
 		
-		assertTrue(LogRotationSlicer.equals(null, null));
-		assertTrue(LogRotationSlicer.equals(r1, r1));
-		assertTrue(LogRotationSlicer.equals(r2, r2));
+		Assert.assertTrue(LogRotationSlicer.equals(null, null));
+		Assert.assertTrue(LogRotationSlicer.equals(r1, r1));
+		Assert.assertTrue(LogRotationSlicer.equals(r2, r2));
 	}
 	
 }

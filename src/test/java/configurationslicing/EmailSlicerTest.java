@@ -21,14 +21,18 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 
-import org.jvnet.hudson.test.HudsonTestCase;
-
 import configurationslicing.email.AbstractEmailSliceSpec;
 import configurationslicing.email.CoreEmailSlicer.CoreEmailSliceSpec;
 import configurationslicing.email.ExtEmailSlicer;
 import configurationslicing.email.ExtEmailSlicer.ExtEmailSliceSpec;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.jvnet.hudson.test.JenkinsRule;
 
-public class EmailSlicerTest extends HudsonTestCase {
+public class EmailSlicerTest {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
 	/**
 	 * Given a project with a core mailer with mailer.sendToIndividuals == true, setting recipients with a slicer must
@@ -39,18 +43,18 @@ public class EmailSlicerTest extends HudsonTestCase {
 	 * @throws Exception
 	 */
 	public void testSendToIndividuals() throws Exception {
-		assertEquals("Setting empty recipients with sendToIndividuals enabled", null, setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), null));
-		assertEquals("Setting >(disabled)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "(disabled)"));
-		assertEquals("Setting >(DISABLED)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "(DISABLED)"));
-		assertEquals("Setting recipients with sendToIndividuals enabled", "john@doe.com sue@gov.com", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "john@doe.com sue@gov.com"));
+		Assert.assertEquals("Setting empty recipients with sendToIndividuals enabled", null, setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), null));
+		Assert.assertEquals("Setting >(disabled)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "(disabled)"));
+		Assert.assertEquals("Setting >(DISABLED)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "(DISABLED)"));
+		Assert.assertEquals("Setting recipients with sendToIndividuals enabled", "john@doe.com sue@gov.com", setAndGetCoreValues(createMavenProjectWithSendToIndividualsAndEmptyRecipients(), "john@doe.com sue@gov.com"));
 
-		assertEquals("Setting empty recipients with sendToIndividuals enabled", null, setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), null));
-		assertEquals("Setting >(disabled)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "(disabled)"));
-		assertEquals("Setting >(DISABLED)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "(DISABLED)"));
-		assertEquals("Setting recipients with sendToIndividuals enabled", "john@doe.com sue@gov.com", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "john@doe.com sue@gov.com"));
+		Assert.assertEquals("Setting empty recipients with sendToIndividuals enabled", null, setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), null));
+		Assert.assertEquals("Setting >(disabled)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "(disabled)"));
+		Assert.assertEquals("Setting >(DISABLED)< with sendToIndividuals enabled", "(Disabled)", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "(DISABLED)"));
+		Assert.assertEquals("Setting recipients with sendToIndividuals enabled", "john@doe.com sue@gov.com", setAndGetCoreValues(createFreestyleProjectWithSendToIndividualsAndEmptyRecipients(), "john@doe.com sue@gov.com"));
 
-		assertEquals("Setting empty recipients with ext mailer", null, setAndGetExtValues(createFreestyleProjectWithExtMailer(), null));
-		assertEquals("Setting >(disabled)< with ext mailer", "(Disabled)", setAndGetExtValues(createFreestyleProjectWithExtMailer(), "(disabled)"));
+		Assert.assertEquals("Setting empty recipients with ext mailer", null, setAndGetExtValues(createFreestyleProjectWithExtMailer(), null));
+		Assert.assertEquals("Setting >(disabled)< with ext mailer", "(Disabled)", setAndGetExtValues(createFreestyleProjectWithExtMailer(), "(disabled)"));
 	}
 
 	public void testNormalize() {
@@ -61,7 +65,7 @@ public class EmailSlicerTest extends HudsonTestCase {
 	}
 	private void doTestNormalize(String email, String expect) {
 		String normalized = new CoreEmailSliceSpec().normalize(email, " ");
-		assertEquals(expect, normalized);
+		Assert.assertEquals(expect, normalized);
 	}
 
 	public void testSetValues() throws Exception {
@@ -84,13 +88,13 @@ public class EmailSlicerTest extends HudsonTestCase {
 
 		AbstractProject project;
 		if (maven) {
-	        String name = createUniqueProjectName();
+	        String name = "test"+j.getInstance().getItems().size();
 	        MavenModuleSet mavenModuleSet = Jenkins.get().createProject(MavenModuleSet.class,name);
 	        mavenModuleSet.setRunHeadless( true );
 
 			project = mavenModuleSet;
 		} else {
-			project = createFreeStyleProject();
+			project = j.createFreeStyleProject();
 		}
 		AbstractEmailSliceSpec spec;
 		if (core) {
@@ -106,20 +110,20 @@ public class EmailSlicerTest extends HudsonTestCase {
 		List<String> gotList = spec.getValues(project);
 		String got = spec.join(gotList);
 
-		assertEquals(expected, got);
+		Assert.assertEquals(expected, got);
 	}
 
 	public void testCommonValues() {
 		UnorderedStringSlice<AbstractProject> slice = new UnorderedStringSlice<AbstractProject>(new ExtEmailSlicer.ExtEmailSliceSpec());
 		List<String> values = slice.getConfiguredValues();
-		assertEquals(3, values.size());
-		assertTrue(values.contains(""));
-		assertTrue(values.contains(ExtEmailSlicer.ExtEmailSliceSpec.DISABLED));
-		assertTrue(values.contains("$DEFAULT_RECIPIENTS"));
+		Assert.assertEquals(3, values.size());
+		Assert.assertTrue(values.contains(""));
+		Assert.assertTrue(values.contains(ExtEmailSlicer.ExtEmailSliceSpec.DISABLED));
+		Assert.assertTrue(values.contains("$DEFAULT_RECIPIENTS"));
 
 		slice.add("test", Collections.singleton("value"));
 		values = slice.getConfiguredValues();
-		assertEquals(4, values.size());
+		Assert.assertEquals(4, values.size());
 	}
 
 	private String setAndGetCoreValues(AbstractProject project, String valuesString) {
@@ -148,7 +152,7 @@ public class EmailSlicerTest extends HudsonTestCase {
 
 	private MavenModuleSet createMavenProjectWithSendToIndividualsAndEmptyRecipients()
 			throws IOException {
-        String name = createUniqueProjectName();
+        String name = "test"+j.getInstance().getItems().size();
         MavenModuleSet mavenModuleSet = Jenkins.get().createProject(MavenModuleSet.class,name);
         mavenModuleSet.setRunHeadless( true );
 
@@ -162,7 +166,7 @@ public class EmailSlicerTest extends HudsonTestCase {
 
 	private AbstractProject createFreestyleProjectWithSendToIndividualsAndEmptyRecipients()
 			throws IOException {
-		FreeStyleProject project = createFreeStyleProject();
+		FreeStyleProject project = j.createFreeStyleProject();
 		Mailer mailer = new Mailer();
 		mailer.sendToIndividuals = true;
 		DescribableList<Publisher,Descriptor<Publisher>> publishers = project.getPublishersList();
@@ -171,7 +175,7 @@ public class EmailSlicerTest extends HudsonTestCase {
 	}
 
 	private AbstractProject createFreestyleProjectWithExtMailer() throws IOException {
-		FreeStyleProject project = createFreeStyleProject();
+		FreeStyleProject project = j.createFreeStyleProject();
 		DescribableList<Publisher,Descriptor<Publisher>> publishers = project.getPublishersList();
 		ExtendedEmailPublisher publisher = new ExtendedEmailPublisher();
 		FailureTrigger trigger = FailureTrigger.createDefault();

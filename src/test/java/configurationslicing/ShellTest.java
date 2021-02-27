@@ -9,11 +9,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jvnet.hudson.test.HudsonTestCase;
-
 import configurationslicing.executeshell.ExecuteShellSlicer;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.jvnet.hudson.test.JenkinsRule;
 
-public class ShellTest extends HudsonTestCase {
+public class ShellTest {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
 	@SuppressWarnings("unchecked")
 	public void testGetMultipleShells() throws Exception {
@@ -25,8 +29,8 @@ public class ShellTest extends HudsonTestCase {
 		Project project = createProject("shell-get", command1, command2);
 		
 		List<String> values = spec.getValues(project);
-		assertEquals(command1, values.get(0));
-		assertEquals(command2, values.get(1));
+		Assert.assertEquals(command1, values.get(0));
+		Assert.assertEquals(command2, values.get(1));
 	}
 	
 	public void testSetMultipleShells() throws Exception {
@@ -49,7 +53,7 @@ public class ShellTest extends HudsonTestCase {
 		// smoke test that the create worked
 		List<String> oldValues = spec.getValues(project);
 		for (int i = 0; i < oldCommands.length; i++) {
-			assertEquals(oldCommands[i], oldValues.get(i));
+			Assert.assertEquals(oldCommands[i], oldValues.get(i));
 		}
 		
 		List<String> newShells = Arrays.asList(newCommands);
@@ -66,15 +70,15 @@ public class ShellTest extends HudsonTestCase {
 		}
 		
 		List<String> newValues = spec.getValues(project);
-		assertEquals(newCommandsClean.size(), newValues.size());
+		Assert.assertEquals(newCommandsClean.size(), newValues.size());
 		for (int i = 0; i < newCommandsClean.size(); i++) {
-			assertEquals(newCommandsClean.get(i), newValues.get(i));
+			Assert.assertEquals(newCommandsClean.get(i), newValues.get(i));
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	private Project createProject(String name, String... shells) throws Exception {
-		Project project = createFreeStyleProject(name);
+		Project project = j.createFreeStyleProject(name);
 		for (String shell: shells) {
 			project.getBuildersList().add(new Shell(shell));
 		}
@@ -96,15 +100,15 @@ public class ShellTest extends HudsonTestCase {
 		UnorderedStringSlice slice = new UnorderedStringSlice(spec, configurationValues, itemNames);
 		
 		List<String> values = slice.get(n1);
-		assertEquals(1, values.size());
-		assertEquals(v1, values.get(0));
+		Assert.assertEquals(1, values.size());
+		Assert.assertEquals(v1, values.get(0));
 	}
 	@SuppressWarnings("unchecked")
 	public void testBracketNames() throws Exception {
 		
-		createFreeStyleProject("a");
-		createFreeStyleProject("b");
-		createFreeStyleProject("c");
+		j.createFreeStyleProject("a");
+		j.createFreeStyleProject("b");
+		j.createFreeStyleProject("c");
 		
 		ExecuteShellSlicer.ExecuteShellSliceSpec spec = new ExecuteShellSlicer.ExecuteShellSliceSpec();
 		
@@ -120,8 +124,8 @@ public class ShellTest extends HudsonTestCase {
 		
 		UnorderedStringSlice slice = new UnorderedStringSlice(spec, configurationValues, itemNames);
 		
-		assertEquals(2, slice.get("a").size());
-		assertEquals(3, slice.get("b").size());
-		assertEquals(5, slice.get("c").size());
+		Assert.assertEquals(2, slice.get("a").size());
+		Assert.assertEquals(3, slice.get("b").size());
+		Assert.assertEquals(5, slice.get("c").size());
 	}
 }

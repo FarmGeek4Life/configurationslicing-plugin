@@ -6,21 +6,26 @@ import hudson.model.AbstractProject;
 import hudson.tasks.Maven.MavenInstallation;
 
 import org.junit.Test;
-import org.jvnet.hudson.test.HudsonTestCase;
 
 import configurationslicing.claim.ClaimSlicer.ClaimSpec;
 import configurationslicing.claim.ClaimSlicer;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.jvnet.hudson.test.JenkinsRule;
 
 
 
-public class ClaimSlicerTest extends HudsonTestCase {
+public class ClaimSlicerTest {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
     /*
      * Test that we can interrogate and set values using the claim slicer on free style projects
      */
     @Test
     public void testFreeStyleValues() throws Exception {
-        AbstractProject item = createFreeStyleProject();
+        AbstractProject item = j.createFreeStyleProject();
         doTestValues(item);
     }
 
@@ -30,7 +35,7 @@ public class ClaimSlicerTest extends HudsonTestCase {
 
     @Test
     public void testMavenValues() throws Exception {
-        String name = createUniqueProjectName();
+        String name = "test"+j.getInstance().getItems().size();
         MavenModuleSet mavenModuleSet = Jenkins.get().createProject(MavenModuleSet.class,name);
         mavenModuleSet.setRunHeadless( true );
 
@@ -46,37 +51,33 @@ public class ClaimSlicerTest extends HudsonTestCase {
     public void testIsLoaded() {
         ClaimSlicer slicer = new ClaimSlicer();
         boolean isLoaded = slicer.isLoaded();
-        assertTrue("Expect claim slicer to be loaded when we have the claim plugin",isLoaded);
+        Assert.assertTrue("Expect claim slicer to be loaded when we have the claim plugin",isLoaded);
     }
 
 
     private void doTestValues(AbstractProject item) {
         ClaimSpec spec = new ClaimSpec();
         boolean claimsEnabled = spec.getValue(item);
-        assertFalse("Claims should be disabled on a new project",claimsEnabled);
+        Assert.assertFalse("Claims should be disabled on a new project",claimsEnabled);
 
         boolean valueSet = spec.setValue(item, false);
-        assertTrue("disabling a value when it is already disabled should work", valueSet);
+        Assert.assertTrue("disabling a value when it is already disabled should work", valueSet);
 
         valueSet = spec.setValue(item,true);
-        assertTrue("setting a value when it is disabled should work", valueSet);
+        Assert.assertTrue("setting a value when it is disabled should work", valueSet);
 
         claimsEnabled = spec.getValue(item);
-        assertTrue("Claims should be enabled after they have been set",claimsEnabled);
+        Assert.assertTrue("Claims should be enabled after they have been set",claimsEnabled);
 
         valueSet = spec.setValue(item,true);
-        assertTrue("setting a value when it is already enabled should work", valueSet);
+        Assert.assertTrue("setting a value when it is already enabled should work", valueSet);
 
         valueSet = spec.setValue(item,false);
-        assertTrue("removing the publisher when it is enabled should work", valueSet);
+        Assert.assertTrue("removing the publisher when it is enabled should work", valueSet);
 
         claimsEnabled = spec.getValue(item);
-        assertFalse("Claims should be disabled after they have been unset",claimsEnabled);
+        Assert.assertFalse("Claims should be disabled after they have been unset",claimsEnabled);        
 
     }
-
-
-
-
 
 }

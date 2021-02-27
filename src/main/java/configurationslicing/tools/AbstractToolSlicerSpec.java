@@ -1,7 +1,6 @@
 package configurationslicing.tools;
 
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;

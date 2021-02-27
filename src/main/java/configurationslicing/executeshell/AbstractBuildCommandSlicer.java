@@ -3,7 +3,6 @@ package configurationslicing.executeshell;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.tasks.Builder;
 import hudson.util.DescribableList;
