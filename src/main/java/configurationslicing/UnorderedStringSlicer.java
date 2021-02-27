@@ -116,4 +116,29 @@ public class UnorderedStringSlicer<I> implements Slicer<UnorderedStringSlice<I>,
     public int compareTo(Slicer<UnorderedStringSlice<I>, I> o) {
     	return getName().compareToIgnoreCase(o.getName());
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + this.getName().hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UnorderedStringSlicer<?> other = (UnorderedStringSlicer<?>) obj;
+        if (!this.getName().equalsIgnoreCase(other.getName())) {
+            return false;
+        }
+        return true;
+    }
 }

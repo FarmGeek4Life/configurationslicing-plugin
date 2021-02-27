@@ -63,7 +63,6 @@ public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
 
         @Override
         public boolean setValue(AbstractProject item, boolean value) {
-            LogstashBuildWrapper logstashWrapper = new LogstashBuildWrapper();
             if(item instanceof Project) {
                 DescribableList bwList = ((Project)item).getBuildWrappersList();
                 List<LogstashBuildWrapper> lsList =

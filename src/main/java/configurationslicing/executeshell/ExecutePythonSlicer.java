@@ -51,6 +51,8 @@ public class ExecutePythonSlicer extends AbstractBuildCommandSlicer<Python> {
             			cons[0].setAccessible(true);
             		}
         			python = (Python) cons[0].newInstance(command);
+                } catch (RuntimeException e) {
+                    throw e;
 				} catch (Exception e) {
 					// we'll try another way to get it
 					python = null;

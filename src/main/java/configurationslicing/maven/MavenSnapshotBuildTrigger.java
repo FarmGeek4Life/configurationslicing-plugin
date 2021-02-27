@@ -20,19 +20,23 @@ public class MavenSnapshotBuildTrigger extends BooleanSlicer<MavenModuleSet> {
 
     public static class MavenSnapshotBuildTriggerSlicerSpec implements BooleanSlicerSpec<MavenModuleSet> {
 
+        @Override
         public String getName() {
             return "Maven Snapshot dependency Build Trigger";
         }
 
+        @Override
         public String getName(MavenModuleSet item) {
             return item.getFullName();
         }
 
+        @Override
         public String getUrl() {
             return "mavenSnapshotBuildTrigger";
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public List<MavenModuleSet> getWorkDomain() {
             return (List) Jenkins.get().getAllItems(MavenModuleSet.class);
         }

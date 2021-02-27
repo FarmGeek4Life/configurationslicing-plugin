@@ -140,26 +140,13 @@ public class LogfilesizecheckerSlicer extends UnorderedStringSlicer<BuildableIte
         }
 
         public static LogfilesizecheckerWrapper newLogfilesizecheckerWrapper(int maxLogSize, boolean failBuild, boolean setOwn) {
-            final Class<LogfilesizecheckerWrapper> cls = LogfilesizecheckerWrapper.class;
-            final Class<?>[] types = new Class<?>[] {Integer.TYPE, Boolean.TYPE, Boolean.TYPE };
-            Constructor<LogfilesizecheckerWrapper> cons;
-            try {
-                cons = cls.getDeclaredConstructor(types);
-            } catch (Exception e) {
-                throw new UnsupportedClassVersionError("Cannot find a version of LogfilesizecheckerWrapper constructor that can be used:" + e.getMessage());
-            }
-            
-            Object[] args = null;
-            if (cons != null) {
-                args = new Object[] {maxLogSize, failBuild, setOwn};
-            }
-
             LogfilesizecheckerWrapper wrapper;
             try {
-                wrapper = (LogfilesizecheckerWrapper) cons.newInstance(args);
+                wrapper = new LogfilesizecheckerWrapper(maxLogSize, failBuild, setOwn);
             } catch (Exception e) {
                 throw new UnsupportedClassVersionError("Cannot find a version of LogfilesizecheckerWrapper constructor that can be used:" + e.getMessage());
             }
+
             return wrapper;
         }
     }

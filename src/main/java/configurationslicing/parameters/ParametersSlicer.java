@@ -89,8 +89,8 @@ public class ParametersSlicer extends UnorderedStringSlicer<Job> {
         }
         public boolean setValues(Job item, List<String> list) {
             ParametersDefinitionProperty prop = (ParametersDefinitionProperty) item.getProperty(ParametersDefinitionProperty.class);
-            List<ParameterDefinition> defs = prop.getParameterDefinitions();
     		if (prop != null) {
+                List<ParameterDefinition> defs = prop.getParameterDefinitions();
             	List<ParameterItem> pitems = getParameterItems(item);
     			boolean changes = false;
     			for (int i = 0; i < list.size(); i++) {
@@ -141,6 +141,7 @@ public class ParametersSlicer extends UnorderedStringSlicer<Job> {
         		for (ParameterDefinition def: prop.getParameterDefinitions()) {
         			if (isSliceableProperty(def)) {
         				ParameterValue value = def.getDefaultParameterValue();
+                        if (value == null) continue;
         				String stringValue = toStringValue(value, def);
         				ParameterItem pitem = new ParameterItem();
         				pitem.index = count++;

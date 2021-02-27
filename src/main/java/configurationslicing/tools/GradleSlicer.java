@@ -48,12 +48,20 @@ public class GradleSlicer extends AbstractToolSlicer {
 		@Override
 		protected Builder getNewBuilder(Builder oldBuilder,
 				String toolInstallationName) {
-			Gradle oldGradle = (Gradle) oldBuilder;
-			return new Gradle(oldGradle.getSwitches(), oldGradle.getTasks(),
-					oldGradle.getRootBuildScriptDir(),
-					oldGradle.getBuildFile(), toolInstallationName,
-					false, oldGradle.isMakeExecutable(),
-					oldGradle.getRootBuildScriptDir(), oldGradle.isUseWorkspaceAsHome(), oldGradle.isPassAllAsSystemProperties());
+			final Gradle oldGradle = (Gradle) oldBuilder;
+            Gradle newGradle = new Gradle();
+            newGradle.setSwitches(oldGradle.getSwitches());
+            newGradle.setTasks(oldGradle.getTasks());
+            newGradle.setRootBuildScriptDir(oldGradle.getRootBuildScriptDir());
+            newGradle.setBuildFile(oldGradle.getBuildFile());
+            newGradle.setGradleName(toolInstallationName);
+            newGradle.setUseWrapper(oldGradle.isUseWrapper());
+            newGradle.setMakeExecutable(oldGradle.isMakeExecutable());
+            newGradle.setWrapperLocation(oldGradle.getRootBuildScriptDir());
+            newGradle.setUseWorkspaceAsHome(oldGradle.isUseWorkspaceAsHome());
+            newGradle.setPassAllAsProjectProperties(oldGradle.isPassAllAsProjectProperties());
+            newGradle.setPassAllAsSystemProperties(oldGradle.isPassAllAsSystemProperties());
+			return newGradle;
 		}
 
 		@Override

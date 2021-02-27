@@ -27,22 +27,27 @@ public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
     public static class MavenGoalsSlicerSpec extends UnorderedStringSlicerSpec<MavenModuleSet> {
         private static final String DEFAULT = "(Default)";
 
+        @Override
         public String getDefaultValueString() {
         	return DEFAULT;
         }
 
+        @Override
         public String getName() {
             return "Maven Goals and Options (Maven project)";
         }
 
+        @Override
         public String getName(MavenModuleSet item) {
             return item.getFullName();
         }
 
+        @Override
         public String getUrl() {
             return "mavengoals";
         }
 
+        @Override
         public List<String> getValues(MavenModuleSet item) {
             List<String> ret = new ArrayList<String>();
             String goals = item.getUserConfiguredGoals();
@@ -51,10 +56,12 @@ public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
         }
 
         @SuppressWarnings("unchecked")
+        @Override
 		public List<MavenModuleSet> getWorkDomain() {
             return (List) Jenkins.get().getAllItems(MavenModuleSet.class);
         }
 
+        @Override
         public boolean setValues(MavenModuleSet item, List<String> set) {
             if(set.isEmpty()) return false;
             String value = set.iterator().next();

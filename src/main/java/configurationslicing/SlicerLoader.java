@@ -1,6 +1,7 @@
 package configurationslicing;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles the problem with Slicers that have class loading issues.
@@ -31,6 +32,26 @@ public abstract class SlicerLoader<T, I> implements Slicer<T, I> {
 	public int compareTo(Slicer<UnorderedStringSlice<I>, I> o) {
 		return 0;
 	}
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        return true;
+    }
 
 	public String getName() {
 		return null;

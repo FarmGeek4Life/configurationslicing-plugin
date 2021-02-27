@@ -2,6 +2,7 @@ package configurationslicing;
 
 
 import java.util.List;
+import java.util.Objects;
 
 
 
@@ -54,5 +55,30 @@ public class BooleanSlicer<I> implements Slicer<BooleanSlice<I>, I>{
     
     public int compareTo(Slicer<BooleanSlice<I>, I> o) {
     	return getName().compareToIgnoreCase(o.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + this.getName().hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BooleanSlicer<?> other = (BooleanSlicer<?>) obj;
+        if (!this.getName().equalsIgnoreCase(other.getName())) {
+            return false;
+        }
+        return true;
     }
 }

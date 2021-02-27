@@ -118,7 +118,6 @@ public class ConfigurationSlicing extends ManagementLink {
     public class SliceExecutor<T extends Slice,I> {
         Slicer<T,I> slicer;
         List<I> worklist;
-        List<I> changed;
         T slice;
         View view;
         public SliceExecutor(Slicer<T, I> s, View view) {
@@ -164,9 +163,6 @@ public class ConfigurationSlicing extends ManagementLink {
 			return slicer;
 		}
 
-        public List<I> getChanged() {
-            return changed;
-        }
         public String getViewDisplayPart() {
         	if (view == null) {
         		return "";
