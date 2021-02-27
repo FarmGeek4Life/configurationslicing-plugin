@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 
 import configurationslicing.UnorderedStringSlicer;
 
-@Extension
+@Extension(optional = true)
 public class ExtEmailSlicer extends	UnorderedStringSlicer<AbstractProject> {
 
 	public ExtEmailSlicer() {

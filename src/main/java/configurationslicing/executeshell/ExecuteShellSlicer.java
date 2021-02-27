@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Slicer for the shell builder
  */
-@Extension
+@Extension(optional = true)
 public class ExecuteShellSlicer extends AbstractBuildCommandSlicer<Shell> {
 
     public ExecuteShellSlicer() {

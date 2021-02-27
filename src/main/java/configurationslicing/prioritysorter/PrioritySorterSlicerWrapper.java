@@ -6,7 +6,7 @@ import configurationslicing.Slicer;
 import configurationslicing.SlicerLoader;
 import configurationslicing.UnorderedStringSlice;
 
-@Extension
+@Extension(optional = true)
 public class PrioritySorterSlicerWrapper extends SlicerLoader<UnorderedStringSlice<Job<?, ?>>, Job<?, ?>> {
 	protected Slicer<UnorderedStringSlice<Job<?, ?>>, Job<?, ?>> buildDelegateOnConstruction() throws Throwable {
 		return new PrioritySorterSlicer();

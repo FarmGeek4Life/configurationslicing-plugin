@@ -15,7 +15,7 @@ import configurationslicing.UnorderedStringSlicer;
 /**
  * @author jacob_robertson
  */
-@Extension
+@Extension(optional = true)
 public class TimestamperSlicer extends UnorderedStringSlicer<BuildableItemWithBuildWrappers>{
 
     public TimestamperSlicer() {

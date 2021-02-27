@@ -16,7 +16,7 @@ import configurationslicing.BooleanSlicer;
 import configurationslicing.TopLevelItemSelector;
 import jenkins.model.Jenkins;
 
-@Extension
+@Extension(optional = true)
 public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
     public LogStashSlicer() {
         super(new LogstashSpec());

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author Jacob Robertson
  */
-@Extension
+@Extension(optional = true)
 public class MavenTargetsSlicer extends AbstractBuildCommandSlicer<Maven> {
 
     public MavenTargetsSlicer() {

@@ -6,7 +6,7 @@ import configurationslicing.Slicer;
 import configurationslicing.SlicerLoader;
 import configurationslicing.UnorderedStringSlice;
 
-@Extension
+@Extension(optional = true)
 public class GroovySlicerWrapper extends SlicerLoader<UnorderedStringSlice<AbstractProject>, AbstractProject> {
 	protected Slicer<UnorderedStringSlice<AbstractProject>, AbstractProject> buildDelegateOnConstruction() throws Throwable {
 		return new GroovySlicer();
