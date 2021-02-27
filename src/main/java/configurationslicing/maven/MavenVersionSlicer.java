@@ -24,7 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 
 @SuppressWarnings("unchecked")
-@Extension
+@Extension(optional = true)
 public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 
 	public MavenVersionSlicer() {
@@ -33,6 +33,7 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 
 	@Override
     public void loadPluginDependencyClass() {
+        // this is just to demonstrate that the Maven plugin is loaded
         MavenModuleSet.class.getClass();
     }
 
@@ -59,7 +60,7 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 
 		public List<String> getValues(AbstractProject item) {
 			if (item instanceof MavenModuleSet) {
-				return getValues((MavenModuleSet) item);
+				return getMavenValues((MavenModuleSet) item);
 			} else {
 				List<String> ret = new ArrayList<String>();
 				List<Maven> builders = getBuilders(item);
@@ -91,9 +92,13 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 			List<Maven> builders = buildersList.getAll(Maven.class);
 			return builders;
 		}
-		public List<String> getValues(MavenModuleSet item) {
+
+		private List<String> getMavenValues(AbstractProject item) {
 			List<String> ret = new ArrayList<String>();
-			MavenInstallation itemMaven = item.getMaven();
+            if (!(item instanceof MavenModuleSet)){
+                return ret;
+            }
+			MavenInstallation itemMaven = ((MavenModuleSet)item).getMaven();
 			if (itemMaven != null) {
 				String itemMavenName = itemMaven.getName();
 				DescriptorImpl descriptorByType =
@@ -134,7 +139,7 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 				return true;
 			}
 			if (item instanceof MavenModuleSet) {
-				return setValues((MavenModuleSet) item, mavenVersion);
+				return setMavenValues((MavenModuleSet) item, mavenVersion);
 			} else {
 				List<Maven> builders = getBuilders(item);
 				DescribableList<Builder,Descriptor<Builder>> buildersList = AbstractBuildCommandSliceSpec.getBuildersList(item);
@@ -151,8 +156,11 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 				return true;
 			}
 		}
-		public boolean setValues(MavenModuleSet item, String mavenVersion) {
-			MavenInstallation old = item.getMaven();
+		private boolean setMavenValues(AbstractProject item, String mavenVersion) {
+            if (!(item instanceof MavenModuleSet)){
+                return false;
+            }
+			MavenInstallation old = ((MavenModuleSet)item).getMaven();
 			String oldName = null;
 			if (old != null) {
 				oldName = old.getName();
@@ -169,7 +177,7 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 				save = true;
 			}
 			if (save) {
-				item.setMaven(mavenVersion);
+				((MavenModuleSet)item).setMaven(mavenVersion);
 				try {
 					item.save();
 					return true;

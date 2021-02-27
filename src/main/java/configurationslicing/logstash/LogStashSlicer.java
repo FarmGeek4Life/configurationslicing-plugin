@@ -14,6 +14,7 @@ import hudson.tasks.BuildWrapper;
 import hudson.util.DescribableList;
 import configurationslicing.BooleanSlicer;
 import configurationslicing.TopLevelItemSelector;
+import jenkins.model.Jenkins;
 
 @Extension
 public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
@@ -47,9 +48,10 @@ public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
 
         private DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappers(
                 AbstractProject item) {
+            boolean mavenPluginAvailable = Jenkins.get().getPlugin("maven-plugin") != null;
             if(item instanceof Project) {
                 return ((Project)item).getBuildWrappersList();
-            } else if(item instanceof MavenModuleSet) {
+            } else if(mavenPluginAvailable && item instanceof MavenModuleSet) {
                 return ((MavenModuleSet)item).getBuildWrappersList();
             } else {
                 return null;
@@ -63,6 +65,7 @@ public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
 
         @Override
         public boolean setValue(AbstractProject item, boolean value) {
+            boolean mavenPluginAvailable = Jenkins.get().getPlugin("maven-plugin") != null;
             if(item instanceof Project) {
                 DescribableList bwList = ((Project)item).getBuildWrappersList();
                 List<LogstashBuildWrapper> lsList =
@@ -77,7 +80,7 @@ public class LogStashSlicer extends BooleanSlicer<AbstractProject> {
                     bwList.removeAll(lsList);
                 }
                 return true;
-            } else if(item instanceof MavenModuleSet) {
+            } else if(mavenPluginAvailable && item instanceof MavenModuleSet) {
                 DescribableList bwList = ((MavenModuleSet)item).getBuildWrappersList();
                 List<LogstashBuildWrapper> lsList =
                         Util.filter(bwList, LogstashBuildWrapper.class);

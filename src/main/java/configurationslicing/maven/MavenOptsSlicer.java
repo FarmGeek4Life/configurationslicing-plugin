@@ -3,8 +3,6 @@ package configurationslicing.maven;
 import hudson.Extension;
 import hudson.maven.MavenModuleSet;
 import hudson.maven.MavenModuleSet.DescriptorImpl;
-import hudson.model.Hudson;
-import hudson.tasks.Maven;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
@@ -12,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import configurationslicing.UnorderedStringSlicer;
+import hudson.model.AbstractProject;
 
-@Extension
-public class MavenOptsSlicer extends UnorderedStringSlicer<MavenModuleSet> {
+@Extension(optional = true)
+public class MavenOptsSlicer extends UnorderedStringSlicer<AbstractProject> {
 
     public MavenOptsSlicer() {
         super(new MavenOptsSlicerSpec());
@@ -26,7 +25,7 @@ public class MavenOptsSlicer extends UnorderedStringSlicer<MavenModuleSet> {
         MavenModuleSet.class.getClass();
     }
 
-    public static class MavenOptsSlicerSpec extends UnorderedStringSlicerSpec<MavenModuleSet> {
+    public static class MavenOptsSlicerSpec extends UnorderedStringSlicerSpec<AbstractProject> {
 
         public String getDefaultValueString() {
         	return null;
@@ -36,7 +35,7 @@ public class MavenOptsSlicer extends UnorderedStringSlicer<MavenModuleSet> {
             return "MAVEN_OPTS per Maven project";
         }
 
-        public String getName(MavenModuleSet item) {
+        public String getName(AbstractProject item) {
             return item.getFullName();
         }
 
@@ -44,27 +43,31 @@ public class MavenOptsSlicer extends UnorderedStringSlicer<MavenModuleSet> {
             return "mavenopts";
         }
 
-        public List<String> getValues(MavenModuleSet item) {
+        public List<String> getValues(AbstractProject item) {
             List<String> ret = new ArrayList<String>();
-            String mavenOpts = item.getMavenOpts();
+            if(!(item instanceof MavenModuleSet)) {
+                return ret;
+            }
+            String mavenOpts = ((MavenModuleSet)item).getMavenOpts();
             ret.add(mavenOpts);
             return ret;
         }
 
         @SuppressWarnings("unchecked")
-		public List<MavenModuleSet> getWorkDomain() {
+		public List<AbstractProject> getWorkDomain() {
             return (List) Jenkins.get().getAllItems(MavenModuleSet.class);
         }
 
-        public boolean setValues(MavenModuleSet item, List<String> set) {
-            if(set.isEmpty()) return false;
+        public boolean setValues(AbstractProject item, List<String> set) {
+            if(set.isEmpty() || !(item instanceof MavenModuleSet)) return false;
+            MavenModuleSet mavenItem = (MavenModuleSet)item;
             String value = set.iterator().next();
             DescriptorImpl descriptor =
                     Jenkins.get().getDescriptorByType(MavenModuleSet.DescriptorImpl.class);
             if(value.equals(descriptor.getGlobalMavenOpts())) {
-                item.setMavenOpts(null);
+                mavenItem.setMavenOpts(null);
             } else {
-                item.setMavenOpts(value);
+                mavenItem.setMavenOpts(value);
             }
             try {
                 item.save();

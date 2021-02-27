@@ -8,7 +8,6 @@ import hudson.maven.MavenReporter;
 import hudson.maven.reporters.MavenMailer;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.tasks.Mailer;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
@@ -34,7 +33,8 @@ public class CoreEmailSlicer extends
 		}
 		@Override
 		protected ProjectHandler getProjectHandler(AbstractProject project) {
-			if (project instanceof MavenModuleSet) {
+            boolean mavenPluginAvailable = Jenkins.get().getPlugin("maven-plugin") != null;
+			if (mavenPluginAvailable && project instanceof MavenModuleSet) {
 				return MavenEmailProjectHandler.INSTANCE;
 			} else {
 				return CoreEmailProjectHandler.INSTANCE;

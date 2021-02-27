@@ -9,7 +9,6 @@ import hudson.tasks.BuildWrapper;
 import hudson.util.DescribableList;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import configurationslicing.UnorderedStringSlicer;
  * Slicing the configuration of the Logfilesizechecker plugin.
  * @author kstutz
  */
-@Extension
+@Extension(optional = true)
 public class LogfilesizecheckerSlicer extends UnorderedStringSlicer<BuildableItemWithBuildWrappers> {
 
     public LogfilesizecheckerSlicer() {

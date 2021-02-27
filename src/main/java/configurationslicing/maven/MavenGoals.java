@@ -2,7 +2,6 @@ package configurationslicing.maven;
 
 import hudson.Extension;
 import hudson.maven.MavenModuleSet;
-import hudson.model.Hudson;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
@@ -10,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import configurationslicing.UnorderedStringSlicer;
+import hudson.model.AbstractProject;
 
-@Extension
-public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
+@Extension(optional = true)
+public class MavenGoals extends UnorderedStringSlicer<AbstractProject> {
 
     public MavenGoals() {
         super(new MavenGoalsSlicerSpec());
@@ -24,7 +24,7 @@ public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
         MavenModuleSet.class.getClass();
     }
 
-    public static class MavenGoalsSlicerSpec extends UnorderedStringSlicerSpec<MavenModuleSet> {
+    public static class MavenGoalsSlicerSpec extends UnorderedStringSlicerSpec<AbstractProject> {
         private static final String DEFAULT = "(Default)";
 
         @Override
@@ -38,7 +38,7 @@ public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
         }
 
         @Override
-        public String getName(MavenModuleSet item) {
+        public String getName(AbstractProject item) {
             return item.getFullName();
         }
 
@@ -48,27 +48,31 @@ public class MavenGoals extends UnorderedStringSlicer<MavenModuleSet> {
         }
 
         @Override
-        public List<String> getValues(MavenModuleSet item) {
+        public List<String> getValues(AbstractProject item) {
             List<String> ret = new ArrayList<String>();
-            String goals = item.getUserConfiguredGoals();
+            if (!(item instanceof MavenModuleSet)) {
+                return ret;
+            }
+            String goals = ((MavenModuleSet)item).getUserConfiguredGoals();
             ret.add(goals == null ? DEFAULT : goals);
             return ret;
         }
 
         @SuppressWarnings("unchecked")
         @Override
-		public List<MavenModuleSet> getWorkDomain() {
+		public List<AbstractProject> getWorkDomain() {
             return (List) Jenkins.get().getAllItems(MavenModuleSet.class);
         }
 
         @Override
-        public boolean setValues(MavenModuleSet item, List<String> set) {
-            if(set.isEmpty()) return false;
+        public boolean setValues(AbstractProject item, List<String> set) {
+            if(set.isEmpty() || !(item instanceof MavenModuleSet)) return false;
+            MavenModuleSet mavenItem = (MavenModuleSet)item;
             String value = set.iterator().next();
             if(DEFAULT.equalsIgnoreCase(value)) {
-                item.setGoals(null);
+                mavenItem.setGoals(null);
             } else {
-                item.setGoals(value);
+                mavenItem.setGoals(value);
             }
             try {
                 item.save();

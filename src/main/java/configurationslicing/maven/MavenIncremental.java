@@ -7,21 +7,27 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 import configurationslicing.BooleanSlicer;
+import hudson.model.AbstractProject;
 
-@Extension
-public class MavenIncremental extends BooleanSlicer<MavenModuleSet> {
+@Extension(optional = true)
+public class MavenIncremental extends BooleanSlicer<AbstractProject> {
 
     public MavenIncremental() {
         super(new MavenIncrementalSlicerSpec());
     }
 
-    public static class MavenIncrementalSlicerSpec implements BooleanSlicerSpec<MavenModuleSet> {
+    @Override
+    public boolean isLoaded() {
+        return Jenkins.get().getPlugin("maven-plugin") != null;
+    }
+
+    public static class MavenIncrementalSlicerSpec implements BooleanSlicerSpec<AbstractProject> {
 
         public String getName() {
             return "Maven Incremental Build";
         }
 
-        public String getName(MavenModuleSet item) {
+        public String getName(AbstractProject item) {
             return item.getFullName();
         }
 
@@ -30,18 +36,20 @@ public class MavenIncremental extends BooleanSlicer<MavenModuleSet> {
         }
 
         @SuppressWarnings("unchecked")
-		public List<MavenModuleSet> getWorkDomain() {
+		public List<AbstractProject> getWorkDomain() {
             return (List) Jenkins.get().getAllItems(MavenModuleSet.class);
         }
 
 		@Override
-		public boolean getValue(MavenModuleSet item) {
-			return item.isIncrementalBuild();
+		public boolean getValue(AbstractProject item) {
+            if (!(item instanceof MavenModuleSet)) return false;
+			return ((MavenModuleSet)item).isIncrementalBuild();
 		}
 
 		@Override
-		public boolean setValue(MavenModuleSet item, boolean value) {
-			item.setIncrementalBuild(value);
+		public boolean setValue(AbstractProject item, boolean value) {
+            if (!(item instanceof MavenModuleSet)) return false;
+			((MavenModuleSet)item).setIncrementalBuild(value);
 			return true;
 		}
 
