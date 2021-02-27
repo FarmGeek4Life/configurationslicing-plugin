@@ -1,8 +1,10 @@
 package configurationslicing.tools;
 
 import hudson.plugins.groovy.Groovy;
+import hudson.plugins.groovy.Groovy.DescriptorImpl;
 import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
+import jenkins.model.Jenkins;
 
 /**
  * @author Maarten Dirkse
@@ -54,7 +56,11 @@ public class GroovySlicer extends AbstractToolSlicer {
 
     @Override
     protected ToolInstallation[] getToolInstallations() {
-      return Groovy.DESCRIPTOR.getInstallations();
+      DescriptorImpl desc = (DescriptorImpl)Jenkins.get().getDescriptor(Groovy.class);
+      if (desc != null) {
+        return desc.getInstallations();
+      }
+      return new ToolInstallation[0];
     }
   }
 }
