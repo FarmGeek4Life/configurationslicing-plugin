@@ -31,12 +31,6 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 		super(new MavenVersionSlicerSpec());
 	}
 
-	@Override
-    public void loadPluginDependencyClass() {
-        // this is just to demonstrate that the Maven plugin is loaded
-        MavenModuleSet.class.getClass();
-    }
-
 	public static class MavenVersionSlicerSpec extends
 			UnorderedStringSlicerSpec<AbstractProject> {
 		private static final String DEFAULT = "(Default)";
@@ -58,9 +52,18 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 			return "mavenversion";
 		}
 
+        private boolean isMavenPluginAvailable() {
+            return Jenkins.get().getPlugin("maven-plugin") != null;
+        }
+
 		public List<String> getValues(AbstractProject item) {
-			if (item instanceof MavenModuleSet) {
-				return getMavenValues((MavenModuleSet) item);
+            List<String> mavenRet = null;
+            if (isMavenPluginAvailable()) {
+                mavenRet = MavenVersionSlicerSpecMavenHandler.getValues(item);
+            }
+            
+			if (mavenRet != null) {
+				return mavenRet;
 			} else {
 				List<String> ret = new ArrayList<String>();
 				List<Maven> builders = getBuilders(item);
@@ -83,6 +86,7 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 				return ret;
 			}
 		}
+
 		private List<Maven> getBuilders(AbstractProject item) {
 			DescribableList<Builder,Descriptor<Builder>> buildersList = AbstractBuildCommandSliceSpec.getBuildersList(item);
 			// JENKINS-18794 - couldn't reproduce, but this is the problematic line
@@ -91,27 +95,6 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 			}
 			List<Maven> builders = buildersList.getAll(Maven.class);
 			return builders;
-		}
-
-		private List<String> getMavenValues(AbstractProject item) {
-			List<String> ret = new ArrayList<String>();
-            if (!(item instanceof MavenModuleSet)){
-                return ret;
-            }
-			MavenInstallation itemMaven = ((MavenModuleSet)item).getMaven();
-			if (itemMaven != null) {
-				String itemMavenName = itemMaven.getName();
-				DescriptorImpl descriptorByType =
-				        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class);
-				MavenInstallation[] installations = descriptorByType.getInstallations();
-				for (MavenInstallation maven : installations) {
-					String mavenName = maven.getName();
-					if (itemMavenName.equals(mavenName)) {
-						ret.add(itemMavenName);
-					}
-				}
-			}
-			return ret;
 		}
 
 		public List<AbstractProject> getWorkDomain() {
@@ -138,8 +121,14 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 			if (MULTIPLE.equals(mavenVersion)) {
 				return true;
 			}
-			if (item instanceof MavenModuleSet) {
-				return setMavenValues((MavenModuleSet) item, mavenVersion);
+            
+            byte mavenRet = -1;
+            if (isMavenPluginAvailable()) {                
+                mavenRet = MavenVersionSlicerSpecMavenHandler.setValues(item, mavenVersion);
+            }
+            
+			if (mavenRet >= 0) {
+				return mavenRet > 0;
 			} else {
 				List<Maven> builders = getBuilders(item);
 				DescribableList<Builder,Descriptor<Builder>> buildersList = AbstractBuildCommandSliceSpec.getBuildersList(item);
@@ -156,36 +145,76 @@ public class MavenVersionSlicer extends UnorderedStringSlicer<AbstractProject> {
 				return true;
 			}
 		}
-		private boolean setMavenValues(AbstractProject item, String mavenVersion) {
-            if (!(item instanceof MavenModuleSet)){
+        
+        public static class MavenVersionSlicerSpecMavenHandler {
+            public static List<String> getValues(AbstractProject item) {
+                if (item instanceof MavenModuleSet) {
+                    return getMavenValues((MavenModuleSet) item);
+                } else {
+                    return null;
+                }
+            }
+
+            private static List<String> getMavenValues(AbstractProject item) {
+                List<String> ret = new ArrayList<String>();
+                if (!(item instanceof MavenModuleSet)){
+                    return ret;
+                }
+                MavenInstallation itemMaven = ((MavenModuleSet)item).getMaven();
+                if (itemMaven != null) {
+                    String itemMavenName = itemMaven.getName();
+                    DescriptorImpl descriptorByType =
+                            Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class);
+                    MavenInstallation[] installations = descriptorByType.getInstallations();
+                    for (MavenInstallation maven : installations) {
+                        String mavenName = maven.getName();
+                        if (itemMavenName.equals(mavenName)) {
+                            ret.add(itemMavenName);
+                        }
+                    }
+                }
+                return ret;
+            }
+
+            public static byte setValues(AbstractProject item, String mavenVersion) {
+                if (item instanceof MavenModuleSet) {
+                    return (byte) (setMavenValues((MavenModuleSet) item, mavenVersion) ? 1 : 0);
+                } else {
+                    return -1;
+                }
+            }
+
+            private static boolean setMavenValues(AbstractProject item, String mavenVersion) {
+                if (!(item instanceof MavenModuleSet)){
+                    return false;
+                }
+                MavenInstallation old = ((MavenModuleSet)item).getMaven();
+                String oldName = null;
+                if (old != null) {
+                    oldName = old.getName();
+                }
+                if (mavenVersion.trim().length() == 0 || DEFAULT.equals(mavenVersion)) {
+                    mavenVersion = null;
+                }
+                boolean save = false;
+                if (mavenVersion == null) {
+                    if (oldName != null) {
+                        save = true;
+                    }
+                } else if (!mavenVersion.equals(oldName)) {
+                    save = true;
+                }
+                if (save) {
+                    ((MavenModuleSet)item).setMaven(mavenVersion);
+                    try {
+                        item.save();
+                        return true;
+                    } catch (IOException e) {
+                        return false;
+                    }
+                }
                 return false;
             }
-			MavenInstallation old = ((MavenModuleSet)item).getMaven();
-			String oldName = null;
-			if (old != null) {
-				oldName = old.getName();
-			}
-			if (mavenVersion.trim().length() == 0 || DEFAULT.equals(mavenVersion)) {
-				mavenVersion = null;
-			}
-			boolean save = false;
-			if (mavenVersion == null) {
-				if (oldName != null) {
-					save = true;
-				}
-			} else if (!mavenVersion.equals(oldName)) {
-				save = true;
-			}
-			if (save) {
-				((MavenModuleSet)item).setMaven(mavenVersion);
-				try {
-					item.save();
-					return true;
-				} catch (IOException e) {
-					return false;
-				}
-			}
-			return false;
 		}
 
 	}
